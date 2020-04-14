@@ -1,7 +1,7 @@
 # Lab-routage-dynamique
 Lab routage dynamique du 14.04.2020
 
-# Etape 1 : Configuration globale des routeurs
+## Etape 1 : Configuration globale des routeurs
 
 ```Router#config t
 Router(config)#hostname R2
@@ -23,7 +23,7 @@ R2#wr
 ```
 Idem pour R1 et R3
 
-# Etape 2 : Verifier, activer et configurer les interfaces IPv4
+## Etape 2 : Verifier, activer et configurer les interfaces IPv4
 
 ```
 R1#show ip int brief
@@ -111,19 +111,21 @@ R1.lan1          Gig 0/1           164              R B             Gig 0/3
 
 R2 et R3 sont bien connectés physiquement entre eux et à R1
 
+```R1(config)#int g0/1
+R1(config-if)#no cdp enable
+```
+Ici, on déactive cdp sur l'interface donnant sur l'Internet (car indiscret)
+`cdp run` permet d'activer globalement sur toutes interfaces du routeurs
+
 ```
 R1#show cdp neighbors
 Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
-R3.lan3          Gig 0/3           148              R B             Gig 0/1
-R2.lan2          Gig 0/2           155              R B             Gig 0/1
-R1.lan           Gig 0/1           168              R B             Gig 0/1
-R1.lan           Gig 0/1           159              R B             Gig 0/1
-R1.lan           Gig 0/1           135              R B             Gig 0/1
-R1.LAB.tripod    Gig 0/1           144              R B             Gig 0/1
-R1               Gig 0/1           176              R B             Gig 0/1
-R1.R1.lan        Gig 0/1           160              R B             Gig 0/1
-R1               Gig 0/1           178              R B             Gig 0/1
-R1.mon.lan       Gig 0/1           122              R B             Gig 0/1
+Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
+R3.lan3          Gig 0/3           154              R B             Gig 0/1
+R2.lan2          Gig 0/2           177              R B             Gig 0/1
+R1.lan           Gig 0/1           2                R B             Gig 0/1
+R1.lan           Gig 0/1           22               R B             Gig 0/1
+R1               Gig 0/1           25               R B             Gig 0/1
 ```
 
 On observe que R2 et R3 sont reliés, puisque qu'on accède aux infos de leurs interfaces connectées. 
@@ -135,6 +137,45 @@ pour obtenir les adresses IP des interfaces voisines.
 
 `show ip route` permet de savoir si la connectivité de L3 est fonctionnelle entre les routeurs.
 On pourra aussi faire un `ping` sur chaque routeur via chaque routeur.
+
+## Etape 3 : Activer DHCP pour Ipv4
+
+```ip dhcp pool LANR1
+network 192.168.1.0 255.255.255.0
+default-router 192.168.1.1
+dns-server 1.1.1.1
+exit
+ip dhcp excluded-address 192.168.1.1 192.168.1.100
+exit
+
+ip dhcp pool LANR2
+network 192.168.33.0 255.255.255.0
+default-router 192.168.33.2
+dns-server 1.1.1.1
+exit
+ip dhcp excluded-address 192.168.33.1 192.168.33.100
+exit
+
+ip dhcp pool LANR3
+network 192.168.65.0 255.255.255.0
+default-router 192.168.65.3
+dns-server 1.1.1.1
+exit
+ip dhcp excluded-address 192.168.65.1 192.168.65.100
+exit
+```
+
+Pour vérifier le pool DHCP :
+`R1#show ip dhcp pool LANR1`
+
+On active le DHCP relay sur R2 et R3 :
+```R2(config)#int g0/0
+R2(config-if)#ip helper-address 192.168.1.1
+
+R3(config)#int g0/0
+R3(config-if)#ip helper-address 192.168.1.1
+```
+Pour le moment, le routage n'est pas activé pour la destination 192.168.1.1 donc PC2 et PC3 ne peuvent pas échanger de messages DHCP.
 
 
 
