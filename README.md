@@ -265,7 +265,81 @@ ipv6 address fe80::3 link-local
 int g0/2
 ipv6 address fe80::3 link-local
 ```
+On configure les Unique Local Address:
+
+```R1
+int g0/0
+ipv6 address fd00:192:168:1::1/64
+int g0/2
+ipv6 address fd00:192:168:225::1/64
+int g0/3
+ipv6 address fd00:192:168:226::1/64
+
+R2
+int g0/0
+ipv6 address fd00:192:168:33::2/64
+int g0/1
+ipv6 address fd00:192:168:225::2/64
+int g0/3
+ipv6 address fd00:192:168:227::2/64
+
+R3
+int g0/0
+ipv6 address fd00:192:168:65::3/64
+int g0/1
+ipv6 address fd00:192:168:226::3/64
+int g0/2
+ipv6 address fd00:192:168:227::3/64
+```
+
+On active sur chacun des routeurs :
+
+`ipv6 unicast-routing`
+
+## Etape 6
+
+## Etape 7 : Activer et configurer de la connec&vité IPv4 publique
+
+On définit les ACL:
+
+```access-list 1 permit 192.168.1.0 0.0.0.255
+access-list 1 permit 192.168.33.0 0.0.0.255
+access-list 1 permit 192.168.65.0 0.0.0.255
+```
+On crée la règle de traduction nat :
+```
+R1(config)#ip nat inside source list 1 interface g0/1 overload
+```
+Overload est necessaire pour avoir plusieurs acces simultannés (plusieurs ip privées auront acces à internet)
+
+On configure les interfaces sur R1 :
+```
+R1(config)#int g0/0
+R1(config-if)#ip nat inside
+R1(config-if)#int g0/2
+R1(config-if)#ip nat inside
+R1(config-if)#int g0/3
+R1(config-if)#ip nat inside
+R1(config-if)#int g0/1
+R1(config-if)#ip nat outside
+R1(config-if)#end
+```
 
 
+Toutefois, les pings à partir de R3 et R2 ne fonctionnent pas. Il leur faut une passerelle par défault.
+`show ip` route sur R3 et R2 nous permet d'observer qu'il n'y a pas de route vers l'internet.
+
+On active cette route manquante :
+
+```R1(config)#router ospf 1
+R1(config-router)#default-information originate
+```
+
+Alors en `show ip route` sur R2 et R3 on observera :
+```OE2  0.0.0.0/0 [110/1] via 192.168.225.1, 00:17:16, GigabitEthernet0/1
+OE2  0.0.0.0/0 [110/1] via 192.168.226.1, 00:17:43, GigabitEthernet0/1
+```
+
+Les ping fonctionnent désormais sur les LAN et les routeurs
 
 
