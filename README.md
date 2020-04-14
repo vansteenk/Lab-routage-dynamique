@@ -177,5 +177,7 @@ R3(config-if)#ip helper-address 192.168.1.1
 ```
 Pour le moment, le routage n'est pas activé pour la destination 192.168.1.1 donc PC2 et PC3 ne peuvent pas échanger de messages DHCP.
 
+## Etape 4 : Configurer et ac/ver le routage OSPFv2
+
 
 
