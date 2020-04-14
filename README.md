@@ -296,9 +296,9 @@ On active sur chacun des routeurs :
 
 `ipv6 unicast-routing`
 
-## Etape 6
+## Etape 6 : OSPFv3
 
-## Etape 7 : Activer et configurer de la connec&vité IPv4 publique
+## Etape 7 : Activer et configurer de la connectivité IPv4 publique
 
 On définit les ACL:
 
@@ -341,5 +341,7 @@ OE2  0.0.0.0/0 [110/1] via 192.168.226.1, 00:17:43, GigabitEthernet0/1
 ```
 
 Les ping fonctionnent désormais sur les LAN et les routeurs
+
+## Etape 8 : Migrer vers EIGRP
 
 
