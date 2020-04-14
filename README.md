@@ -21,7 +21,7 @@ R2(config-line)#exit
 R2(config)#exit
 R2#wr
 ```
-
+Idem pour R1 et R3
 
 # Etape 2 : Verifier, activer et configurer les interfaces IPv4
 
@@ -94,7 +94,7 @@ GigabitEthernet0/7         unassigned      YES NVRAM  administratively down down
 
 Idem sur R2 et R3 : les interfaces configurées sont up.
 
-show ip int brief permet d'avoir les infos de L2 (colonne status : logique ; colonne protocol : physique) pour chacun des routeurs
+`show ip int brief` permet d'avoir les infos de L2 (colonne status : logique ; colonne protocol : physique) pour chacun des routeurs
 
 ```
 R2#show cdp neighbors
