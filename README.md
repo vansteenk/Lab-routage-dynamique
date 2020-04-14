@@ -177,7 +177,93 @@ R3(config-if)#ip helper-address 192.168.1.1
 ```
 Pour le moment, le routage n'est pas activé pour la destination 192.168.1.1 donc PC2 et PC3 ne peuvent pas échanger de messages DHCP.
 
-## Etape 4 : Configurer et ac/ver le routage OSPFv2
+## Etape 4 : Configurer et activer le routage OSPFv2
+
+Bande passante à 1 Gbit/s
+
+```R1#router ospf 1
+R1(config-router)#router-id 1.1.1.1
+R1(config-router)#passive-interface g0/0
+R1(config-router)#network 192.168.1.1 0.0.0.0 area 0
+R1(config-router)#network 192.168.225.1 0.0.0.0 area 0
+R1(config-router)#network 192.168.226.1 0.0.0.0 area 0
+R1(config-router)#auto-cost reference-bandwidth 1000 
+
+R2
+router ospf 1
+router-id 2.2.2.2
+passive-interface g0/0
+network 192.168.33.2 0.0.0.0 area 0
+network 192.168.225.2 0.0.0.0 area 0
+network 192.168.227.2 0.0.0.0 area 0
+auto-cost reference-bandwidth 1000 
+
+R3
+router ospf 1
+router-id 3.3.3.3
+passive-interface g0/0
+network 192.168.65.3 0.0.0.0 area 0
+network 192.168.226.3 0.0.0.0 area 0
+network 192.168.227.3 0.0.0.0 area 0
+auto-cost reference-bandwidth 1000 
+```
+
+Les interfaces dites "passives" sont celles qui n'envoient aucun message d'un protocole de routage comme OSPF.
+Par contre, ce+e mesure n'empêche pas l'interface de prendre en compte des messages OSPF.
+
+On verifiera la configuration PSPFv2 avec `show ip protocols | b ospf 1`
+On remarquera les ID des routeurs voisins.
+
+`show id ospf neighbor` permet de voir sui est DR
+`clear ip ospf process`
+R3 est DR (ID la plus elevée qui remporte l'élection)
+R2 est DR
+R1 est BDR
+
+On pourra changer la priorité 
+```(config)# interface G0/0
+(config-if)# ip ospf priority 255
+```
+L'ensemble des destinations à joindre est :
+192.168.1.0
+192.168.33.0
+192.168.65.0
+192.168.225.0
+192.168.226.0
+192.168.227.0
+
+On retrouvera l'ensemble des destinations joignable avec `sh ip route` sur chaque router.
+
+On verifiera la connectivité avec `ping` de bout en bout PC2 > PC1 et PC3 > PC1 
+
+## Etape 5 : Activer les interfaces et le routage IPv6
+
+On configure link-local sur chaque interface :
+
+```R1(config)#int g0/0
+R1(config-if)#ipv6 address fe80::1 link-local
+R1(config-if)#int g0/2
+R1(config-if)#ipv6 address fe80::1 link-local
+R1(config-if)#int g0/3
+R1(config-if)#ipv6 address fe80::1 link-local
+
+R2
+int g0/0
+ipv6 address fe80::2 link-local
+int g0/1
+ipv6 address fe80::2 link-local
+int g0/3
+ipv6 address fe80::2 link-local
+
+R3
+int g0/0
+ipv6 address fe80::3 link-local
+int g0/1
+ipv6 address fe80::3 link-local
+int g0/2
+ipv6 address fe80::3 link-local
+```
+
 
 
 
