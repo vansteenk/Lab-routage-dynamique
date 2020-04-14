@@ -218,21 +218,21 @@ On remarquera les ID des routeurs voisins.
 
 `show id ospf neighbor` permet de voir sui est DR
 `clear ip ospf process`
-*R3 est DR (ID la plus elevée qui remporte l'élection)
-*R2 est DR
-*R1 est BDR
+* R3 est DR (ID la plus elevée qui remporte l'élection)
+* R2 est DR
+* R1 est BDR
 
 On pourra changer la priorité 
 ```(config)# interface G0/0
 (config-if)# ip ospf priority 255
 ```
 L'ensemble des destinations à joindre est :
-*192.168.1.0
-*192.168.33.0
-*192.168.65.0
-*192.168.225.0
-*192.168.226.0
-*192.168.227.0
+* 192.168.1.0
+* 192.168.33.0
+* 192.168.65.0
+* 192.168.225.0
+* 192.168.226.0
+* 192.168.227.0
 
 On retrouvera l'ensemble des destinations joignable avec `sh ip route` sur chaque router.
 
