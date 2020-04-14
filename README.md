@@ -115,6 +115,7 @@ R2 et R3 sont bien connectés physiquement entre eux et à R1
 R1(config-if)#no cdp enable
 ```
 Ici, on déactive cdp sur l'interface donnant sur l'Internet (car indiscret)
+
 `cdp run` permet d'activer globalement sur toutes interfaces du routeurs
 
 ```
@@ -129,7 +130,8 @@ R1               Gig 0/1           25               R B             Gig 0/1
 ```
 
 On observe que R2 et R3 sont reliés, puisque qu'on accède aux infos de leurs interfaces connectées. 
-( Holdtme = la Valeur du délai de conservation en secondes, Capability = le Code de capacité du périphérique voisin)
+
+(Holdtme = la Valeur du délai de conservation en secondes, Capability = le Code de capacité du périphérique voisin)
 
 On pourra faire 
 ```R1#show cdp neighbors detail``` 
@@ -209,28 +211,28 @@ auto-cost reference-bandwidth 1000
 ```
 
 Les interfaces dites "passives" sont celles qui n'envoient aucun message d'un protocole de routage comme OSPF.
-Par contre, ce+e mesure n'empêche pas l'interface de prendre en compte des messages OSPF.
+Par contre, cette mesure n'empêche pas l'interface de prendre en compte des messages OSPF.
 
-On verifiera la configuration PSPFv2 avec `show ip protocols | b ospf 1`
+On verifiera la configuration PSPFv2 avec `show ip protocols | b ospf 1`.
 On remarquera les ID des routeurs voisins.
 
 `show id ospf neighbor` permet de voir sui est DR
 `clear ip ospf process`
-R3 est DR (ID la plus elevée qui remporte l'élection)
-R2 est DR
-R1 est BDR
+*R3 est DR (ID la plus elevée qui remporte l'élection)
+*R2 est DR
+*R1 est BDR
 
 On pourra changer la priorité 
 ```(config)# interface G0/0
 (config-if)# ip ospf priority 255
 ```
 L'ensemble des destinations à joindre est :
-192.168.1.0
-192.168.33.0
-192.168.65.0
-192.168.225.0
-192.168.226.0
-192.168.227.0
+*192.168.1.0
+*192.168.33.0
+*192.168.65.0
+*192.168.225.0
+*192.168.226.0
+*192.168.227.0
 
 On retrouvera l'ensemble des destinations joignable avec `sh ip route` sur chaque router.
 
