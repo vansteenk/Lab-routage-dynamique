@@ -3,7 +3,7 @@ Lab routage dynamique du 14.04.2020
 
 # Etape 1 : Configuration globale des routeurs
 
-* Router#config t
+`Router#config t
 Router(config)#hostname R2
 R2(config)#enable secret testtest
 R2(config)#service password-encryption
@@ -19,7 +19,7 @@ R2(config-line)#transport input ssh
 R2(config-line)#login local
 R2(config-line)#exit
 R2(config)#exit
-R2#wr*
+R2#wr`
 
 
 # Etape 2 : Verifier, activer et configurer les interfaces IPv4
