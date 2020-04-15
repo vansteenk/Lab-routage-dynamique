@@ -3,7 +3,8 @@ Lab routage dynamique du 14.04.2020
 
 ## Etape 1 : Configuration globale des routeurs
 
-```Router#config t
+```
+Router#config t
 Router(config)#hostname R2
 R2(config)#enable secret testtest
 R2(config)#service password-encryption
@@ -112,7 +113,8 @@ R1.lan1          Gig 0/1           164              R B             Gig 0/3
 R2 et R3 sont bien connectés physiquement entre eux et à R1
 
 Ici, on déactive cdp sur l'interface donnant sur l'Internet de R1 (car indiscret) :
-```R1(config)#cdp run
+```
+R1(config)#cdp run
 R1(config)#int g0/1
 R1(config-if)#no cdp enable
 R3(config-if)#exit
@@ -151,7 +153,8 @@ On pourra aussi faire un `ping` sur chaque routeur via chaque routeur.
 
 Sur R1, création des pools dhcp, exclusion plages d'adresses :
 
-```ip dhcp pool LANR1
+```
+ip dhcp pool LANR1
 network 192.168.1.0 255.255.255.0
 default-router 192.168.1.1
 dns-server 1.1.1.1
@@ -180,7 +183,8 @@ Pour vérifier le pool DHCP :
 `R1#show ip dhcp pool LANR1`
 
 On active le DHCP relay sur R2 et R3 :
-```R2(config)#int g0/0
+```
+R2(config)#int g0/0
 R2(config-if)#ip helper-address 192.168.1.1
 
 R3(config)#int g0/0
@@ -199,7 +203,8 @@ Pour le moment, le routage n'est pas activé pour la destination 192.168.1.1 don
 
 Bande passante à 1 Gbit/s
 
-```R1#router ospf 1
+```
+R1#router ospf 1
 R1(config-router)#router-id 1.1.1.1
 R1(config-router)#passive-interface g0/0
 R1(config-router)#network 192.168.1.1 0.0.0.0 area 0
@@ -239,7 +244,8 @@ On remarquera les ID des routeurs voisins.
 * R1 est BDR
 
 On pourra changer la priorité Sur R1 pour qu'il devienne DR :
-```R1(config)#int g0/2
+```
+R1(config)#int g0/2
 R1(config-if)#ip ospf priority 255
 R1(config)#int g0/3
 R1(config-if)#ip ospf priority 255
@@ -269,7 +275,8 @@ On verifiera la connectivité avec `ping` de bout en bout PC2 > PC1 et PC3 > PC1
 
 On configure link-local sur chaque interface :
 
-```R1(config)#int g0/0
+```
+R1(config)#int g0/0
 R1(config-if)#ipv6 address fe80::1 link-local
 R1(config-if)#int g0/2
 R1(config-if)#ipv6 address fe80::1 link-local
@@ -294,7 +301,8 @@ ipv6 address fe80::3 link-local
 ```
 On configure les Unique Local Address:
 
-```R1
+```
+R1
 int g0/0
 ipv6 address fd00:192:168:1::1/64
 int g0/2
@@ -329,11 +337,14 @@ On active sur chacun des routeurs :
 ## Etape 6 : OSPFv3
 
 Activation processus OSPFv3 (ipv6)
-```R1(config)#ipv6 router ospf 1```
+```
+R1(config)#ipv6 router ospf 1
+```
 
 LAN activé en passive interface
 
-```R1(config-rtr)#passive-interface g0/0
+```
+R1(config-rtr)#passive-interface g0/0
 R1(config-rtr)#router-id 1.1.1.1
 R1(config-rtr)#int g0/0
 R1(config-if)#ipv6 ospf 1 area 0
@@ -369,14 +380,16 @@ R3(config-if)#ipv6 ospf 1 area 0
 ## Etape 7 : Activer et configurer de la connectivité IPv4 publique
 
 Activer interface externe de R1 :
-```R1(config)#int g0/1
+```
+R1(config)#int g0/1
 R1(config-if)#ip address dhcp
 R1(config-if)#no shu
 ```
 
 On définit les ACL:
 
-```access-list 1 permit 192.168.1.0 0.0.0.255
+```
+access-list 1 permit 192.168.1.0 0.0.0.255
 access-list 1 permit 192.168.33.0 0.0.0.255
 access-list 1 permit 192.168.65.0 0.0.0.255
 ```
@@ -405,12 +418,14 @@ Toutefois, les pings à partir de R3 et R2 ne fonctionnent pas. Il leur faut une
 
 Pour transmettre la route par défaut aux autres routeurs :
 
-```R1(config)#router ospf 1
+```
+R1(config)#router ospf 1
 R1(config-router)#default-information originate
 ```
 
 Alors en `show ip route` sur R2 et R3 on observera :
-```OE2  0.0.0.0/0 [110/1] via 192.168.225.1, 00:17:16, GigabitEthernet0/1
+```
+OE2  0.0.0.0/0 [110/1] via 192.168.225.1, 00:17:16, GigabitEthernet0/1
 OE2  0.0.0.0/0 [110/1] via 192.168.226.1, 00:17:43, GigabitEthernet0/1
 ```
 
