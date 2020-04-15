@@ -97,6 +97,18 @@ Idem sur R2 et R3 : les interfaces configurées sont up.
 
 `show ip int brief` permet d'avoir les infos de L1/L2 (colonne status : L1 ; colonne protocol : L2) pour chacun des routeurs
 
+CDP est activé par défaut:
+
+```
+R1#show cdp
+Global CDP information:
+        Sending CDP packets every 60 seconds
+        Sending a holdtime value of 180 seconds
+        Sending CDPv2 advertisements is  enabled
+```
+
+On notera que des annonces CDP sont envoyées toutes les 60s (device ID, version d'ios, type de plateforme, adresses,...)
+
 ```
 R2#show cdp neighbors
 Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
@@ -237,7 +249,7 @@ Par contre, cette mesure n'empêche pas l'interface de prendre en compte des mes
 On verifiera la configuration PSPFv2 avec `show ip protocols | b ospf 1`.
 On remarquera les ID des routeurs voisins.
 
-`show id ospf neighbor` permet de voir sui est DR
+`show id ospf neighbor` permet de voir qui est DR
 `clear ip ospf process`
 * R3 est DR (ID la plus elevée qui remporte l'élection)
 * R2 est DR
@@ -250,7 +262,7 @@ R1(config-if)#ip ospf priority 255
 R1(config)#int g0/3
 R1(config-if)#ip ospf priority 255
 ```
-L'ensemble des destinations à joindre est :
+L'ensemble des destinations à joindre est:
 * 192.168.1.0
 * 192.168.33.0
 * 192.168.65.0
@@ -305,26 +317,17 @@ On configure les Unique Local Address:
 R1
 int g0/0
 ipv6 address fd00:192:168:1::1/64
-int g0/2
-ipv6 address fd00:192:168:225::1/64
-int g0/3
-ipv6 address fd00:192:168:226::1/64
+
 
 R2
 int g0/0
 ipv6 address fd00:192:168:33::2/64
-int g0/1
-ipv6 address fd00:192:168:225::2/64
-int g0/3
-ipv6 address fd00:192:168:227::2/64
+
 
 R3
 int g0/0
 ipv6 address fd00:192:168:65::3/64
-int g0/1
-ipv6 address fd00:192:168:226::3/64
-int g0/2
-ipv6 address fd00:192:168:227::3/64
+
 ```
 
 On active sur chacun des routeurs :
@@ -341,11 +344,13 @@ Activation processus OSPFv3 (ipv6)
 R1(config)#ipv6 router ospf 1
 ```
 
-LAN activé en passive interface
+
 
 ```
-R1(config-rtr)#passive-interface g0/0
-R1(config-rtr)#router-id 1.1.1.1
+ipv6 router ospf 1
+passive-interface GigabitEthernet0/0
+router-id 1.1.1.1
+
 R1(config-rtr)#int g0/0
 R1(config-if)#ipv6 ospf 1 area 0
 R1(config-if)#int g0/2
@@ -355,9 +360,9 @@ R1(config-if)#int g0/3
 R1(config-if)#ipv6 ospf 1 area 0
 R1(config-if)#ipv6 ospf priority 255
 
-R2(config)#ipv6 router ospf 1
-R2(config-rtr)#passive-interface g0/0
-R2(config-rtr)#router-id 2.2.2.2
+ipv6 router ospf 1
+passive-interface GigabitEthernet0/0
+router-id 2.2.2.2
 R2(config-rtr)#int g0/0
 R2(config-if)#ipv6 ospf 1 area 0
 R2(config-if)#int g0/1
@@ -365,6 +370,9 @@ R2(config-if)#ipv6 ospf 1 area 0
 R2(config-if)#int g0/3
 R2(config-if)#ipv6 ospf 1 area 0
 
+ipv6 router ospf 1
+passive-interface GigabitEthernet0/0
+router-id 3.3.3.3
 R3(config)#ipv6 router ospf 1
 R3(config-rtr)#passive-
 R3(config-rtr)#passive-interface g0/0
